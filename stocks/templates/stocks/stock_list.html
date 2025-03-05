@@ -1,78 +1,187 @@
 <!DOCTYPE html>
 <html lang="zh">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>股票監測系統</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-</head>
-<body id="stock-list-container" class="container mt-5">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+  </head>
+  <body id="stock-list-container" class="container mt-5">
     <h2>📊 股票監測系統</h2>
-    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addStockModal">
-        ➕ 新增股票
+    <button
+      type="button"
+      class="btn btn-primary mb-3"
+      data-bs-toggle="modal"
+      data-bs-target="#addStockModal"
+    >
+      ➕ 新增股票
+    </button>
+    <button
+      type="button"
+      class="btn btn-secondary mb-3"
+      data-bs-toggle="modal"
+      data-bs-target="#addBulkStockModal"
+    >
+      ➕ 批量新增股票
     </button>
     <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>股票代號</th>
-                <th>警報閾值 (%)</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for stock in stocks %}
-            <tr>
-                <td>{{ stock.symbol }}</td>
-                <td>{{ stock.threshold }}</td>
-                <td>
-                    <a href="{% url 'check_stocks' %}" class="btn btn-warning">檢查價格</a>
-                    <a href="{% url 'delete_stock' stock.id %}" class="btn btn-danger">刪除</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
+      <thead>
+        <tr>
+          <th>股票代號</th>
+          <th>股票名稱</th>
+          <th>最小下跌 (%)</th>
+          <th>最大下跌 (%)</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for stock in stocks %}
+        <tr>
+          <td>{{ stock.symbol }}</td>
+          <td>{{ stock.name }}</td>
+          <td>{{ stock.small_drop_threshold }}</td>
+          <td>{{ stock.large_drop_threshold }}</td>
+          <td>
+            <a href="{% url 'check_stocks' %}" class="btn btn-warning"
+              >檢查價格</a
+            >
+            <a href="{% url 'delete_stock' stock.id %}" class="btn btn-danger"
+              >刪除</a
+            >
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
-    <div class="modal fade" id="addStockModal" tabindex="-1" aria-labelledby="addStockModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addStockModalLabel">📈 新增監測股票</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div id="stock-form-container" class="modal-body">
-                    <form id="addStockForm" method="post">
-                        {% csrf_token %}
-                        {{ form.as_p }}
-                        <button type="submit" class="btn btn-success w-100">確認新增</button>
-                    </form>
-                </div>
-            </div>
+    <div
+      class="modal fade"
+      id="addStockModal"
+      tabindex="-1"
+      aria-labelledby="addStockModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addStockModalLabel">📈 新增監測股票</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div id="stock-form-container" class="modal-body">
+            <form id="addStockForm" method="post">
+              {% csrf_token %} {{ form.as_p }}
+              <button type="submit" class="btn btn-success w-100">
+                確認新增
+              </button>
+            </form>
+          </div>
         </div>
+      </div>
+    </div>
+    <div
+      class="modal fade"
+      id="addBulkStockModal"
+      tabindex="-1"
+      aria-labelledby="addBulkStockModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addBulkStockModalLabel">
+              📈 批量新增股票
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div id="stock-form-container" class="modal-body">
+            <form id="addBulkStockForm" method="post">
+              {% csrf_token %}
+              <textarea
+                class="form-control"
+                name="symbols"
+                rows="10"
+                placeholder="輸入多個股票代號，使用換行區分"
+              ></textarea>
+              <button type="submit" class="btn btn-success w-100 mt-3">
+                批量新增
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-
+  </body>
 </html>
 <script>
-    document.getElementById("addStockForm").addEventListener("submit", function (event) {
-        event.preventDefault();  // 防止預設提交行為
-        let formData = new FormData(this);
+  document
+    .getElementById("addStockForm")
+    .addEventListener("submit", function (event) {
+      event.preventDefault(); // 防止表單的預設提交行為
+      let formData = new FormData(this);
 
-        fetch("{% url 'add_stock' %}", {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
-            }
+      fetch("{% url 'add_stock' %}", {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-Requested-With": "XMLHttpRequest", // 確保是 AJAX 請求
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            // 更新股票列表
+            document.getElementById("stock-list-container").innerHTML =
+              data.html;
+            document.getElementById("addStockForm").reset(); // 清空表單
+            $("#addStockModal").modal("hide");
+          } else {
+            // 如果有錯誤，顯示表單錯誤訊息
+            document.getElementById("stock-form-container").innerHTML =
+              data.html;
+          }
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById("stock-list-container").innerHTML = data.html;
-                document.getElementById("addStockForm").reset();  // 清空表單
-            } else {
-                document.getElementById("stock-form-container").innerHTML = data.html;
-            }
+        .catch((error) => {
+          console.error("There was a problem with the fetch operation:", error);
+        });
+    });
+    document
+    .getElementById("addBulkStockForm")
+    .addEventListener("submit", function (event) {
+      event.preventDefault(); // 防止表單的預設提交行為
+      let formData = new FormData(this);
+
+      fetch("{% url 'add_stocks' %}", {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-Requested-With": "XMLHttpRequest", // 確保是 AJAX 請求
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            // 更新股票列表
+            document.getElementById("stock-list-container").innerHTML = data.html;
+            document.getElementById("addBulkStockForm").reset(); // 清空表單
+            $('#addBulkStockModal').modal('hide');
+          } else {
+            alert("新增失敗: " + data.errors.join("\n"));
+          }
+        })
+        .catch((error) => {
+          console.error("There was a problem with the fetch operation:", error);
         });
     });
 </script>
