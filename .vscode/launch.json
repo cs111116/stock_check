@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Django: check_stocks",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}",
+            "args": [
+                "check_stocks"
+            ],
+            "env": {
+                "DJANGO_SETTINGS_MODULE": "stock_alert.settings"
+            }
+        }
+    ]
+}

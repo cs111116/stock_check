@@ -16,6 +16,7 @@ def main():
         ) from exc
 
     # 確保執行 check_stocks 命令
+    sys.argv.append('check_stocks')  # 這將會自動添加命令
     execute_from_command_line(sys.argv)
 
 if __name__ == '__main__':

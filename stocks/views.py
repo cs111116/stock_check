@@ -70,6 +70,7 @@ def add_stocks(request):
                 # 查詢股票名稱
                 try:
                     stock_name = get_stock_name(symbol)
+                    print(stock_name)
                     stock = Stock(symbol=symbol_with_ticker, name=stock_name)
                     stock.small_drop_threshold, stock.large_drop_threshold = get_drop_threshold(symbol_with_ticker)  # 計算小跌和大跌閾值
                     stock.save()
