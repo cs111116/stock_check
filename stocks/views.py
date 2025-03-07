@@ -14,11 +14,6 @@ def check_stocks(request):
     """手動觸發股票監測"""
     check_stock_prices()
     return redirect("stock_list")
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from .models import Stock
-from .utils import get_drop_threshold
-from .forms import StockForm
 
 def stock_list(request):
     """顯示監測中的股票列表"""
@@ -59,23 +54,14 @@ def add_stocks(request):
         for symbol in stock_list:
             symbol = symbol.strip()  # 移除多餘的空格
             if symbol:
-                if symbol.isdigit():  # 判斷是否為數字，為台股
-                    symbol_with_ticker = f"{symbol}.TW"
-                elif symbol.isalpha() and symbol.isupper():  # 判斷是否為大寫字母，為美股
-                    symbol_with_ticker = f"{symbol}"
-                else:
-                    errors.append(f"無效的股票代號：{symbol}")
-                    continue
-
                 # 查詢股票名稱
                 try:
                     stock_name = get_stock_name(symbol)
-                    print(stock_name)
-                    stock = Stock(symbol=symbol_with_ticker, name=stock_name)
-                    stock.small_drop_threshold, stock.large_drop_threshold = get_drop_threshold(symbol_with_ticker)  # 計算小跌和大跌閾值
+                    stock = Stock(symbol=symbol, name=stock_name)
+                    stock.small_drop_threshold, stock.large_drop_threshold = get_drop_threshold(symbol)  # 計算小跌和大跌閾值
                     stock.save()
                 except Exception as e:
-                    errors.append(f"無法新增 {symbol_with_ticker}: {str(e)}")
+                    errors.append(f"無法新增 {symbol}: {str(e)}")
 
         if errors:
             return JsonResponse({"success": False, "errors": errors})
