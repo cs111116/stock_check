@@ -56,11 +56,11 @@ class WebScraperFetcher:
             # 獲取股價相關數據
             data = {
                 'Date': [pd.to_datetime('today')],
-                'Current Price': [current_price],
-                'Previous Close': [previous_close],
-                'Open Price': [open_price],
-                'High Price': [high_price],
-                'Low Price': [low_price],
+                'Current_Price': [current_price],
+                'Previous_Close': [previous_close],
+                'Open_Price': [open_price],
+                'High_Price': [high_price],
+                'Low_Price': [low_price],
                 'Volume': [volume],
             }
             df = pd.DataFrame(data)

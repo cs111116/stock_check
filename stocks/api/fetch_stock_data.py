@@ -19,20 +19,19 @@ def fetch_stock_data(symbol):
         print(f"Failed to fetch valid real-time data for {symbol}.")
         return None
     return data
-def fetch_history(symbol, start_date):
+def fetch_history(symbol, start_date=None):
     # 歷史股價抓取
     # 使用 TwseFetcher 來抓取歷史股價資料
     twse_fetcher = TwseFetcher()
     strategy = FetchStrategy(twse_fetcher)
     data = strategy.fetch_history(symbol,start_date)
-    pdb.set_trace()
     if data is None:
         print(f"Failed to fetch valid historical data for {symbol}.")
         return None
     return data
 def is_valid_data(data):
     """檢查資料是否有效"""
-    required_fields = ['Current Price', 'Previous Close', 'Open Price', 'High Price', 'Low Price', 'Volume']
+    required_fields = ['Current_Price', 'Previous_Close', 'Open_Price', 'High_Price', 'Low_Price', 'Volume']
     # 檢查每個必須的欄位是否存在且不是空
     for field in required_fields:
         if field not in data or data[field] is None or (hasattr(data[field], 'empty') and data[field].empty):

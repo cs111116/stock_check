@@ -1,6 +1,7 @@
 import requests
 from .models import Stock
 from datetime import datetime
+import yfinance as yf
 from django.conf import settings
 import logging
 import json
@@ -8,16 +9,20 @@ import pdb
 import os
 from .api.fetch_stock_data import fetch_stock_data,fetch_history
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-# CHAT_ID = os.getenv("CHAT_ID")
-CHAT_ID = os.getenv("TEST_CHAT_ID")
+CHAT_ID = os.getenv("CHAT_ID")
+# CHAT_ID = os.getenv("TEST_CHAT_ID")
 ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
-logging.basicConfig(
-    filename='stock_check.log',  # 設定 log 文件名稱
-    level=logging.INFO,  # 設定日誌等級
-    format='%(asctime)s - %(levelname)s - %(message)s',  # 日誌格式
-    encoding='utf-8'
-)
-
+try:
+    logging.basicConfig(
+        filename='stock_check.log',  # 設定 log 文件名稱
+        level=logging.INFO,  # 設定日誌等級
+        format='%(asctime)s - %(levelname)s - %(message)s',  # 日誌格式
+        encoding='utf-8'
+    )
+except PermissionError as e:
+    print(f"日誌檔案創建失敗，權限錯誤: {e}")
+except Exception as e:
+    print(f"其他錯誤: {e}")
 def calculate_pct_change(history):
     """計算每日收盤價的百分比變動"""
     return history['Close'].pct_change() * 100
@@ -31,8 +36,9 @@ def calculate_threshold(pct_change, num_std_dev=1):
 
 def get_drop_threshold(symbol):
     """計算小跌與大跌閾值，基於過去六個月股價的標準差"""
-    history = fetch_history(symbol,'20250101')
-    pdb.set_trace()
+    history = fetch_history(symbol)
+    # stock = yf.Ticker(f"{symbol}.TW")
+    # history = stock.history("6mo")
     if history is None:
         return None, None
     daily_pct_change = calculate_pct_change(history)
@@ -45,9 +51,16 @@ def get_stock_price(symbol):
     data = fetch_stock_data(symbol)
     if data is None:
        logging.error(f"資料不足，無法計算股價：{symbol}")
-       print(f"資料不足，無法計算股價：{symbol}")
        return None
-    return data
+    # 假设 data 是一个 DataFrame，我们从中提取最后一行数据
+    latest_data = data.iloc[-1]  # 获取最新的一行数据
+    # 提取必要的字段
+    current_price = latest_data['Current_Price']
+    previous_close = latest_data['Previous_Close']
+    max_price = latest_data['High_Price']
+    min_price = latest_data['Low_Price']
+    sell_Volume = latest_data['Volume']
+    return current_price, previous_close, max_price, min_price, sell_Volume
 def send_telegram_alert(message):
     """發送 Telegram 通知"""
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
@@ -56,7 +69,7 @@ def send_telegram_alert(message):
     response = requests.post(url, data=data)
 
     if response.status_code != 200:
-        print("❌ 發送失敗，請檢查 BOT_TOKEN、CHAT_ID 是否正確！")
+        logging.error("❌ 發送失敗，請檢查 BOT_TOKEN、CHAT_ID 是否正確！")
 
 def generate_alert_message(stock, trend, price_change_percentage, current_price, previous_close, max_price, min_price,small_drop_threshold, large_drop_threshold,sell_Volume):
     """生成警報訊息"""
@@ -73,12 +86,13 @@ def generate_alert_message(stock, trend, price_change_percentage, current_price,
 
 def check_stock_prices():
     """檢查股票價格並回報目前的股價與漲跌幅"""
+    logging.info(f"Starting")
     for stock in Stock.objects.all():
         try:
             result = get_stock_price(stock.symbol)
             if result is None:
                 # 可以跳過處理，或者進行相應的錯誤處理
-                print(f"資料不足，無法處理股價：{stock.name}")
+                logging.error(f"資料不足，無法處理股價：{stock.name}")
             else:
                 current_price, previous_close, max_price, min_price,sell_Volume = result   # 取得即時價格
             price_change = current_price - previous_close
@@ -88,27 +102,28 @@ def check_stock_prices():
                 trend = "🟢 小跌"
                 alert_message = generate_alert_message(stock, trend, abs(price_change_percentage), current_price, previous_close, max_price, min_price,stock.small_drop_threshold, stock.large_drop_threshold,sell_Volume)
                 send_telegram_alert(alert_message)
-                # stock.alert_sent_today = True  # 標記為已發送
-                # stock.save()
+                stock.alert_sent_today = True  # 標記為已發送
+                stock.save()
                 logging.info(f"Stock {stock.symbol} - {stock.name}: 下跌, alert sent.")
             elif price_change < 0 and abs(price_change_percentage) >= stock.large_drop_threshold and not stock.alert_sent_today:
                 trend = "🟢🟢 大跌"
                 alert_message = generate_alert_message(stock, trend, abs(price_change_percentage), current_price, previous_close, max_price, min_price,stock.small_drop_threshold, stock.large_drop_threshold,sell_Volume)
                 send_telegram_alert(alert_message)
-                # stock.alert_sent_today = True  # 標記為已發送
-                # stock.save()
+                stock.alert_sent_today = True  # 標記為已發送
+                stock.save()
                 logging.info(f"Stock {stock.symbol} - {stock.name}: 大跌, alert sent.")
             else:
-                trend = "測試"
-                alert_message = generate_alert_message(stock, trend, abs(price_change_percentage), current_price, previous_close, max_price, min_price,stock.small_drop_threshold, stock.large_drop_threshold,sell_Volume)
-                send_telegram_alert(alert_message)
+                logging.info(f"Stock {stock.symbol} - {stock.name}: nothing, alert sent.")
+                # trend = "測試"
+                # alert_message = generate_alert_message(stock, trend, abs(price_change_percentage), current_price, previous_close, max_price, min_price,stock.small_drop_threshold, stock.large_drop_threshold,sell_Volume)
+                # send_telegram_alert(alert_message)
             # 清除每日通知標記，讓下一次檢查重新設置
             if stock.last_alert_sent and stock.last_alert_sent.date() != datetime.today().date():
                 stock.alert_sent_today = False
                 stock.save()
         except Exception as e:
             logging.error(f"Error checking stock {stock.symbol}: {str(e)}")
-
+    logging.info(f"Ending")
 def get_filename_for_today():
     """生成當前日期的檔案名稱"""
     return f"{datetime.now().strftime('%Y%m%d')}_stock_data.json"
@@ -140,10 +155,10 @@ def download_and_save_stock_data(file_path):
         with open(file_path, 'w') as f:
             json.dump(data, f)
 
-        print(f"資料已下載並儲存: {file_path}")
+        logging.error(f"資料已下載並儲存: {file_path}")
         return data
     else:
-        print("資料下載失敗，請檢查 API 設定")
+        logging.error("資料下載失敗，請檢查 API 設定")
         return None
 
 def load_stock_data(file_path):

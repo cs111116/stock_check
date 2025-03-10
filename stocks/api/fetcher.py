@@ -24,11 +24,11 @@ class YahooFinanceFetcher(StockDataFetcher):
                 previousDate = history.iloc[-2]
                 data = {
                     'Date': [pd.to_datetime('today')],
-                    'Current Price': [round(todayDate['Close'],2)],
-                    'Previous Close': [round(previousDate["Close"],2)],
-                    'Open Price': [round(todayDate["Open"],2)],
-                    'High Price': [ round(todayDate["High"],2)],
-                    'Low Price': [round(todayDate["Low"],2)],
+                    'Current_Price': [round(todayDate['Close'],2)],
+                    'Previous_Close': [round(previousDate["Close"],2)],
+                    'Open_Price': [round(todayDate["Open"],2)],
+                    'High_Price': [ round(todayDate["High"],2)],
+                    'Low_Price': [round(todayDate["Low"],2)],
                     'Volume': [ todayDate["Volume"]]
                 }
             # 檢查資料是否為空，若為空則視為抓取失敗
