@@ -1,6 +1,16 @@
+# 忽略環境變數
 .env
+
+# 忽略特定目錄
 /media
 /dist
 /build
+
+# 忽略所有 __pycache__ 資料夾
 __pycache__/
+*/__pycache__/
+
+# 忽略所有 .pyc 編譯快取檔案
 *.pyc
+*.pyo
+*.pyd
