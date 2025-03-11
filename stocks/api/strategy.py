@@ -9,9 +9,9 @@ class FetchStrategy:
         """可以動態切換策略"""
         self._strategy = strategy
 
-    def fetch(self, symbol):
+    def fetch(self, symbol, max_retries=3, retry_delay=2):
         """執行抓取策略"""
-        return self._strategy.fetch_data(symbol)
+        return self._strategy.fetch_data(symbol, max_retries,retry_delay)
     def fetch_history(self, symbol, start_date):
         """執行歷史股價抓取策略"""
         return self._strategy.fetch_history_data(symbol, start_date)

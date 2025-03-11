@@ -4,6 +4,8 @@ from dateutil.relativedelta import relativedelta
 from stocks.models import StockData
 import pdb
 from django.db import transaction
+from stocks.log_config import logging_info,logging_error
+import pandas as pd
 class TwseFetcher:
     def fetch_history_data(self, symbol, start_date=None):
         """從台灣證券交易所抓取歷史股價資料並存入資料庫"""
@@ -15,19 +17,18 @@ class TwseFetcher:
         for date in date_array:
             # 檢查資料庫中是否已存在該股票資料
             if self.check_data_in_db(symbol, self.get_previous_valid_date(date)):
-                print(f"Data for {symbol} on {date} already exists. Skipping fetch.")
                 continue  # 如果資料已存在，跳過爬取
             else:
                 # 如果資料不存在，開始爬蟲
-                print(f"Fetching data for {symbol} on {date}...")
+                logging_info(f"搜尋{symbol}股票 時間在{date}...")
                 url = f"https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={date}&stockNo={symbol}"
                 response = requests.get(url)
                 # 如果回應成功，返回 JSON 資料
                 if response.status_code == 200:
-                    print(f"Data saved for {symbol} on {date}.")
+                    logging_info(f"Data saved for {symbol} on {date}.")
                     self.save_to_db(symbol, response.json())  # 存入資料庫
                 else:
-                    print(f"Failed to fetch data for {symbol} on {date}. Status code: {response.status_code}")
+                    logging_error(f"Failed to fetch data for {symbol} on {date}. Status code: {response.status_code}")
         return self.get_data_by_date(symbol,date_array[-1],date_array[0])
     def get_data_by_date(self, symbol, start_date, end_date):
         """從資料庫取出該股票指定時間範圍內的歷史資料，並按照日期排序"""
@@ -36,11 +37,20 @@ class TwseFetcher:
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date() if isinstance(start_date, str) else start_date
             end_date = datetime.strptime(end_date, "%Y-%m-%d").date() if isinstance(end_date, str) else end_date
             data = StockData.objects.filter(symbol=symbol, date__range=[start_date, end_date]).order_by('date')
-            pdb.set_trace()
         else:
             return None
-        return data  # 返回按日期排序的資料
-
+        history_data = []
+        for stock_data in data:
+            history_data.append({
+                'Date': stock_data.date.strftime('%Y-%m-%d'),
+                'Close': stock_data.close,  # 收盤價
+                'Open': stock_data.open,  # 開盤價
+                'High': stock_data.high,  # 最高價
+                'Low': stock_data.low,  # 最低價
+                'Volume': stock_data.volume  # 成交量
+            })
+        df = pd.DataFrame(history_data)
+        return df
     def _get_date_str_for_month(self, start_date=None):
         """根據當前日期，獲取過去六個月的日期（格式 YYYYMMDD）"""
         if start_date:
@@ -63,37 +73,41 @@ class TwseFetcher:
                 try:
                     # 解析日期，將民國年轉換為西元年
                     split_date = stock_data[0].split('/')
-                    gregorian_year= int(split_date[0]) + 1911
-                    month= int(split_date[1])
-                    date= int(split_date[2])
+                    gregorian_year = int(split_date[0]) + 1911
+                    month = int(split_date[1])
+                    date = int(split_date[2])
                     formatted_date = f"{gregorian_year}-{month:02d}-{date:02d}"  # 組合為西元年月日格式
+                    if not self.check_data_in_db(symbol, formatted_date):
 
-                    # 去除數字中的逗號並轉換為浮點數
-                    open_price = self.safe_float(stock_data[3])
-                    high_price = self.safe_float(stock_data[4])
-                    low_price = self.safe_float(stock_data[5])
-                    close_price = self.safe_float(stock_data[6])
-                    volume = int(stock_data[8].replace(',', ''))  # 去除千分位逗號
-                    price_change = self.safe_float(stock_data[7])  # 漲跌價差
-                    # 格式化資料
-                    stock_data_obj = StockData(
-                        symbol=symbol,
-                        date=formatted_date,  # 解析日期
-                        open_price=open_price,
-                        high_price=high_price,
-                        low_price=low_price,
-                        close_price=close_price,
-                        volume=volume,
-                        price_change=price_change
-                    )
-                    stock_data_obj.save()  # 儲存到資料庫
+                        # 去除數字中的逗號並轉換為浮點數
+                        open_price = self.safe_float(stock_data[3])
+                        high_price = self.safe_float(stock_data[4])
+                        low_price = self.safe_float(stock_data[5])
+                        close_price = self.safe_float(stock_data[6])
+                        volume = int(stock_data[8].replace(',', ''))  # 去除千分位逗號
+                        price_change = self.safe_float(stock_data[7])  # 漲跌價差
+
+                        # 格式化資料並儲存
+                        stock_data_obj = StockData(
+                            symbol=symbol,
+                            date=formatted_date,  # 解析日期
+                            open=open_price,  # 使用 open 代替 open_price
+                            high=high_price,  # 使用 high 代替 high_price
+                            low=low_price,  # 使用 low 代替 low_price
+                            close=close_price,  # 使用 close 代替 close_price
+                            volume=volume,  # 使用 volume 代替 volume
+                            price_change=price_change  # 使用 price_change 代替 price_change
+                        )
+                        stock_data_obj.save()  # 儲存到資料庫
+
                 except Exception as e:
-                    print(f"Failed to save data for {symbol} on {formatted_date}: {e}")
+                    logging_error(f"儲存錯誤 {symbol} 時間 {formatted_date}: {e}")
+                    logging_error(f"股票資料: {stock_data}")
+                    logging_error(f"儲存資料: {stock_data_obj}")
                     # 可以在此處發送錯誤通知或記錄錯誤
                     # 若有錯誤，事務將回滾
                     transaction.set_rollback(True)
-                    raise    # 拋出錯誤，讓整個事務回滾並中止後續操作
-
+                    raise  # 拋出錯誤，讓整個事務回滾並中止後續操作
     def get_previous_valid_date(self, date):
         """根据日期找出下一个有效交易日（例如工作日）"""
         date_obj = datetime.strptime(date, "%Y-%m-%d")  # 转换为日期对象

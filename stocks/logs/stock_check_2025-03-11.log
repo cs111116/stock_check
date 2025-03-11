@@ -1,0 +1,86 @@
+2025-03-11 17:31:44,053 - INFO - 搜尋2330股票 時間在2025-02-01...
+2025-03-11 17:31:44,428 - INFO - Data saved for 2330 on 2025-02-01.
+2025-03-11 17:31:44,492 - INFO - 搜尋2330股票 時間在2025-01-01...
+2025-03-11 17:31:44,818 - INFO - Data saved for 2330 on 2025-01-01.
+2025-03-11 17:31:44,821 - ERROR - 儲存錯誤 2330 時間 2024-12-02: UNIQUE constraint failed: stocks_stockdata.symbol, stocks_stockdata.date
+2025-03-11 17:31:44,821 - ERROR - 股票資料: ['113/12/02', '33,333,423', '34,325,585,125', '1,020.00', '1,040.00', '1,015.00', '1,035.00', '+39.00', '42,112']
+2025-03-11 17:31:44,821 - ERROR - 儲存資料: 2330 - 2024-12-02
+2025-03-11 17:34:08,025 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:34:08,675 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:34:11,259 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:34:12,122 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:34:32,813 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:34:33,493 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:46:19,225 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:46:19,919 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:46:43,271 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:46:43,911 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:47:04,141 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:47:04,814 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:47:12,456 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:47:13,103 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:47:17,580 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:47:18,211 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:47:33,997 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:47:34,630 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:47:37,868 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:47:38,498 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:47:47,492 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:47:48,209 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:47:50,151 - INFO - 搜尋2330股票 時間在2025-02-01...
+2025-03-11 17:47:50,528 - INFO - Data saved for 2330 on 2025-02-01.
+2025-03-11 17:48:33,727 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:48:34,359 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:48:42,549 - INFO - 搜尋2330股票 時間在2025-02-01...
+2025-03-11 17:48:42,917 - INFO - Data saved for 2330 on 2025-02-01.
+2025-03-11 17:48:42,920 - ERROR - 儲存錯誤 2330 時間 2024-12-02: UNIQUE constraint failed: stocks_stockdata.symbol, stocks_stockdata.date
+2025-03-11 17:48:42,920 - ERROR - 股票資料: ['113/12/02', '33,333,423', '34,325,585,125', '1,020.00', '1,040.00', '1,015.00', '1,035.00', '+39.00', '42,112']
+2025-03-11 17:48:42,920 - ERROR - 儲存資料: 2330 - 2024-12-02
+2025-03-11 17:49:36,737 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:49:37,405 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:49:42,952 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:49:43,660 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:49:45,691 - INFO - 搜尋2330股票 時間在2025-02-01...
+2025-03-11 17:49:46,482 - INFO - Data saved for 2330 on 2025-02-01.
+2025-03-11 17:49:46,493 - INFO - 搜尋2330股票 時間在2025-01-01...
+2025-03-11 17:49:46,852 - INFO - Data saved for 2330 on 2025-01-01.
+2025-03-11 17:49:46,885 - INFO - 搜尋2330股票 時間在2024-11-01...
+2025-03-11 17:49:47,235 - INFO - Data saved for 2330 on 2024-11-01.
+2025-03-11 17:49:47,256 - INFO - 搜尋2330股票 時間在2024-10-01...
+2025-03-11 17:49:47,655 - INFO - Data saved for 2330 on 2024-10-01.
+2025-03-11 17:49:47,679 - INFO - 搜尋2330股票 時間在2024-09-01...
+2025-03-11 17:49:48,046 - INFO - Data saved for 2330 on 2024-09-01.
+2025-03-11 17:50:26,653 - INFO - C:\Users\User\php_project\python\stock_check\stocks\utils.py changed, reloading.
+2025-03-11 17:50:27,862 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:51:13,337 - INFO - C:\Users\User\php_project\python\stock_check\stocks\utils.py changed, reloading.
+2025-03-11 17:51:13,995 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:51:15,416 - INFO - 搜尋2330股票 時間在2025-02-01...
+2025-03-11 17:51:15,844 - INFO - Data saved for 2330 on 2025-02-01.
+2025-03-11 17:51:15,853 - INFO - 搜尋2330股票 時間在2025-01-01...
+2025-03-11 17:51:16,181 - INFO - Data saved for 2330 on 2025-01-01.
+2025-03-11 17:51:16,189 - INFO - 搜尋2330股票 時間在2024-11-01...
+2025-03-11 17:51:16,518 - INFO - Data saved for 2330 on 2024-11-01.
+2025-03-11 17:51:16,526 - INFO - 搜尋2330股票 時間在2024-10-01...
+2025-03-11 17:51:16,812 - INFO - Data saved for 2330 on 2024-10-01.
+2025-03-11 17:51:16,820 - INFO - 搜尋2330股票 時間在2024-09-01...
+2025-03-11 17:51:17,112 - INFO - Data saved for 2330 on 2024-09-01.
+2025-03-11 17:52:03,059 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:52:03,708 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:52:06,167 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:52:06,846 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:52:10,988 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:52:11,891 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:52:14,381 - INFO - 搜尋2330股票 時間在2025-02-01...
+2025-03-11 17:52:14,720 - INFO - Data saved for 2330 on 2025-02-01.
+2025-03-11 17:52:14,728 - INFO - 搜尋2330股票 時間在2025-01-01...
+2025-03-11 17:52:15,038 - INFO - Data saved for 2330 on 2025-01-01.
+2025-03-11 17:52:15,047 - INFO - 搜尋2330股票 時間在2024-11-01...
+2025-03-11 17:52:15,348 - INFO - Data saved for 2330 on 2024-11-01.
+2025-03-11 17:52:15,356 - INFO - 搜尋2330股票 時間在2024-10-01...
+2025-03-11 17:52:15,653 - INFO - Data saved for 2330 on 2024-10-01.
+2025-03-11 17:52:15,661 - INFO - 搜尋2330股票 時間在2024-09-01...
+2025-03-11 17:52:15,961 - INFO - Data saved for 2330 on 2024-09-01.
+2025-03-11 17:52:46,425 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:52:47,110 - INFO - Watching for file changes with StatReloader
+2025-03-11 17:59:21,045 - INFO - C:\Users\User\php_project\python\stock_check\stocks\api\twsefetcher.py changed, reloading.
+2025-03-11 17:59:21,716 - INFO - Watching for file changes with StatReloader

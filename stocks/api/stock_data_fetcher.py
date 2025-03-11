@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class StockDataFetcher(ABC):
     @abstractmethod
-    def fetch_data(self, symbol):
+    def fetch_data(self, symbol, max_retries=3, retry_delay=2):
         """ 抓取股票資料的方法 """
         pass
     def fetch_history_data(self, symbol, start_date=None):

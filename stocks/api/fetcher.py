@@ -2,19 +2,21 @@
 from .stock_data_fetcher import StockDataFetcher
 import yfinance as yf
 import pandas as pd
-
+from stocks.log_config import logging_info,logging_error
+import pdb
 class YahooFinanceFetcher(StockDataFetcher):
     """從 Yahoo Finance 抓取資料的具體實現"""
-    def fetch_data(self, symbol):
+    def fetch_data(self, symbol, max_retries,retry_delay):
         """從 Yahoo Finance 抓取股票資料"""
         if symbol.isdigit():  # 判斷是否為數字，為台股
             symbol = f"{symbol}.TW"
         elif symbol.isalpha() and symbol.isupper():  # 判斷是否為大寫字母，為美股
             symbol = f"{symbol}"
         else:
-            print(f"無效的股票代號：{symbol}")
+            logging_error(f"無效的股票代號：{symbol}")
             return None
         try:
+            logging_info("YF_API 開始 {symbol}")
             stock = yf.Ticker(symbol)
             history = stock.history("2d")
             if len(history) == 2 and not history.iloc[-1].isnull().any() and not history.iloc[-2].isnull().any():
@@ -31,14 +33,13 @@ class YahooFinanceFetcher(StockDataFetcher):
                     'Low_Price': [round(todayDate["Low"],2)],
                     'Volume': [ todayDate["Volume"]]
                 }
-            # 檢查資料是否為空，若為空則視為抓取失敗
-            if not data:
-                raise ValueError(f"Cannot fetch data for symbol: {symbol} from Yahoo Finance.")
             else:
-                df = pd.DataFrame(data)
+                logging_error(f"回傳資料失敗 : {history}")
+                return None
+            df = pd.DataFrame(data)
             return df
         except Exception as e:
-            print(f"Error fetching data from Yahoo Finance for {symbol}: {e}")
+            logging_error(f"YF_API發生意外錯誤 {symbol}: {e}")
             return None
     # def fetch_history_data(self, symbol, start_date):
     #     """從 Yahoo Finance 抓取歷史股價資料"""
