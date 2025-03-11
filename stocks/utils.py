@@ -25,16 +25,18 @@ def calculate_threshold(pct_change, num_std_dev=1):
 
 def get_drop_threshold(symbol):
     """計算小跌與大跌閾值，基於過去六個月股價的標準差"""
-    history1 = fetch_history(symbol)
-    stock = yf.Ticker(f"{symbol}.TW")
-    history2 = stock.history("6mo")
-    # if history is None:
-    #     return None, None
-    daily_pct_change1 = calculate_pct_change(history1)
-    daily_pct_change2 = calculate_pct_change(history2)
-    pdb.set_trace()
-    small_drop_threshold = calculate_threshold(daily_pct_change1, num_std_dev=1)  # 小跌閾值（1標準差）
-    large_drop_threshold = calculate_threshold(daily_pct_change1, num_std_dev=2)  # 大跌閾值（2標準差）
+    history = fetch_history(symbol)
+    # stock = yf.Ticker(f"{symbol}.TW")
+    # history2 = stock.history("6mo")
+    if history is None:
+        return None, None
+    try:
+        daily_pct_change1 = calculate_pct_change(history)
+        small_drop_threshold = calculate_threshold(daily_pct_change1, num_std_dev=1)  # 小跌閾值（1標準差）
+        large_drop_threshold = calculate_threshold(daily_pct_change1, num_std_dev=2)  # 大跌閾值（2標準差）
+    except Exception as e:
+        logging_info(f"計算{symbol}歷史資料錯誤: {e}")
+        raise
     return abs(small_drop_threshold), abs(large_drop_threshold)
 
 def get_stock_price(symbol):
