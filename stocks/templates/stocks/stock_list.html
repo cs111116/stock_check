@@ -26,6 +26,9 @@
     >
       ➕ 批量新增股票
     </button>
+    <button type="button" class="btn btn-warning mb-3">
+      <a href="{% url 'set_stock_info' %}" style="text-decoration: none; color: inherit;"> 更新股票資訊 </a>
+    </button>
     <table class="table table-striped">
       <thead>
         <tr>
@@ -156,7 +159,7 @@
           console.error("There was a problem with the fetch operation:", error);
         });
     });
-    document
+  document
     .getElementById("addBulkStockForm")
     .addEventListener("submit", function (event) {
       event.preventDefault(); // 防止表單的預設提交行為
@@ -173,9 +176,10 @@
         .then((data) => {
           if (data.success) {
             // 更新股票列表
-            document.getElementById("stock-list-container").innerHTML = data.html;
+            document.getElementById("stock-list-container").innerHTML =
+              data.html;
             document.getElementById("addBulkStockForm").reset(); // 清空表單
-            $('#addBulkStockModal').modal('hide');
+            $("#addBulkStockModal").modal("hide");
           } else {
             alert("新增失敗: " + data.errors.join("\n"));
           }

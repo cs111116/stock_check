@@ -7,7 +7,6 @@ import pdb
 from django.db import transaction
 from stocks.log_config import logging_info, logging_error
 import pandas as pd
-
 class TwseFetcher:
     def fetch_history_data(self, symbol, start_date=None):
         """從台灣證券交易所抓取歷史股價資料並存入資料庫"""

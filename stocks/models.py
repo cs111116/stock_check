@@ -25,3 +25,12 @@ class StockData(models.Model):
         unique_together = ('symbol', 'date')
     def __str__(self):
         return f"{self.symbol} - {self.date}"
+class StockInfo(models.Model):
+    stock_code = models.CharField(max_length=10, unique=True)  # 股票代號
+    stock_name = models.CharField(max_length=100)  # 股票名稱
+    market_type = models.IntegerField(choices=[(1, 'Listed'), (2, 'OTC')])  # 市場別 (1=上市, 2=上櫃)
+    security_type = models.IntegerField(choices=[(1, 'Stock'), (2, 'ETF')])  # 有價證券別 (1=股票, 2=ETF)
+    industry = models.CharField(max_length=50)  # 產業別
+
+    def __str__(self):
+        return f"{self.stock_code} - {self.stock_name}"

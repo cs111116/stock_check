@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .models import Stock
-from .utils import check_stock_prices,get_drop_threshold,get_stock_name
+from .utils import check_stock_prices,get_drop_threshold,get_stock_name,set_stokc_info
 from .forms import StockForm
 
 def stock_list(request):
@@ -74,4 +74,7 @@ def delete_stock(request, stock_id):
     """刪除監測股票"""
     stock = Stock.objects.get(id=stock_id)
     stock.delete()
+    return redirect("stock_list")
+def set_stock_info(request):
+    set_stokc_info()
     return redirect("stock_list")

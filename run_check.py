@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 import os
 import sys
-
+from stocks.log_config import setup_logging
 def main():
+    setup_logging()
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'stock_alert.settings')
     # 確保在腳本中正確加載 Django
