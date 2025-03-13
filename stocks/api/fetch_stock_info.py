@@ -24,7 +24,7 @@ def fetch_stock_info():
         soup = BeautifulSoup(response.text, "html.parser")
         # 解析 HTML 並抓取資料
         stocks_info = []
-        for row in soup.select('table tr')[2:]:  # 排除標題行
+        for row in soup.select('table tr')[1:]:  # 排除標題行
             cols = row.find_all('td')
             if len(cols) < 7:
                 continue
