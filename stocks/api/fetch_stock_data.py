@@ -11,18 +11,18 @@ from stocks.log_config import logging_info,logging_error
 def fetch_stock_data(symbol):
     """統一的資料抓取邏輯，根據資料類型抓取即時股價"""
     # 即時股價抓取
-    yf_fetcher = YahooFinanceFetcher()
+    yf_fetcher = WebScraperFetcher()
     strategy = FetchStrategy(yf_fetcher)
-    logging_info(f"使用YahooFinanceFetcher API {symbol}")
+    logging_info(f"使用 YAHOO網站爬蟲  {symbol}")
     data = strategy.fetch(symbol, max_retries=3, retry_delay=2)
     if data is None or not is_valid_data(data):
-        logging_info(f"YahooFinanceFetcher API失敗... {symbol}:{data}")
-        logging_info(f"使用YAHOO網站爬蟲 {symbol}")
-        scraper_fetcher = WebScraperFetcher()
+        logging_info(f"YAHOO網站爬蟲失敗... {symbol}:{data}")
+        logging_info(f"使用 YAHOO API {symbol}")
+        scraper_fetcher = YahooFinanceFetcher()
         strategy.set_strategy(scraper_fetcher)  # 切換爬蟲策略
         data = strategy.fetch(symbol, max_retries=3, retry_delay=2)
         if data is None or not is_valid_data(data):
-            logging_info(f"YahooFinanceFetcher API&爬蟲失敗 {symbol}.")
+            logging_info(f"YAHOO API&爬蟲失敗 {symbol}.")
             return None
     logging_info(f"{symbol} 成功獲取")
     return data

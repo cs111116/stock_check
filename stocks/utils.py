@@ -54,9 +54,9 @@ def send_telegram_alert(stock, trend, price_change_percentage, data):
         f"目前成交量: {(data['Volume']/1000):.2f}張"
     ]
     if data['Forward_dividend_yield']:
-        message_lines.append(f"目前殖利率: {data['Forward_dividend_yield']}")
+        message_lines.append(f"目前殖利率(測試中): {data['Forward_dividend_yield']}")
     elif data['Yield']:
-        message_lines.append(f"宣告殖利率: {data['Yield']}")
+        message_lines.append(f"宣告殖利率(測試中): {data['Yield']}")
     send_message = "\n".join(message_lines)
     """發送 Telegram 通知"""
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
@@ -97,8 +97,8 @@ def check_stock_prices():
                 logging_info(f"Stock {stock.symbol} - {stock.name}: 大跌, 大跌警報已寄送")
             else:
                 logging_info(f"Stock {stock.symbol} - {stock.name}: 無顯著變動。")
-                trend = "測試"
-                send_telegram_alert(stock, trend, abs(price_change_percentage), result)
+                # trend = "測試"
+                # send_telegram_alert(stock, trend, abs(price_change_percentage), result)
             # 清除每日通知標記，讓下一次檢查重新設置
             if stock.last_alert_sent and stock.last_alert_sent.date() != datetime.today().date():
                 stock.alert_sent_today = False
