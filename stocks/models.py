@@ -1,5 +1,26 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
+class User(AbstractUser):
+    email = models.EmailField(unique=True)  # 用戶的電子郵件
+    password = models.CharField(max_length=255)  # 用戶的密碼
+    chat_id = models.CharField(max_length=255, blank=True, null=True)  # 用來發送通知的 Telegram chat_id
+    is_active = models.BooleanField(default=True)  # 用戶是否活躍
 
+    # 修改 groups 和 user_permissions，添加 unique 的 related_name
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='stocks_user_set',  # 避免與 auth.User.groups 發生衝突
+        blank=True,
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='stocks_user_permissions_set',  # 避免與 auth.User.user_permissions 發生衝突
+        blank=True,
+    )
+
+    def __str__(self):
+        return self.email
 class Stock(models.Model):
     symbol = models.CharField(max_length=10, unique=True)  # 股票代號
     name = models.CharField(max_length=255, null=True, blank=True)  # 股票名稱
@@ -34,3 +55,14 @@ class StockInfo(models.Model):
 
     def __str__(self):
         return f"{self.stock_code} - {self.stock_name}"
+
+class Subscription(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='subscriptions')  # 訂閱的用戶
+    stock = models.ForeignKey(StockInfo, on_delete=models.CASCADE, related_name='subscriptions')  # 訂閱的股票
+    subscribed_at = models.DateTimeField(auto_now_add=True)  # 訂閱時間
+
+    def __str__(self):
+        return f"{self.user.email} subscribes to {self.stock.stock_code}"
+
+    class Meta:
+        unique_together = ('user', 'stock')  # 確保同一個用戶不能重複訂閱同一隻股票

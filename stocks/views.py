@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from .models import Stock
+from django.contrib import messages
+from .models import Stock,User
 from .utils import check_stock_prices,get_drop_threshold,get_stock_name,set_stokc_info
-from .forms import StockForm
-
+from .forms import StockForm,UserForm
+from django.template.loader import render_to_string
+import pdb
 def stock_list(request):
     """顯示監測中的股票列表"""
     stocks = Stock.objects.all()
@@ -14,12 +16,6 @@ def check_stocks(request):
     """手動觸發股票監測"""
     check_stock_prices()
     return redirect("stock_list")
-
-def stock_list(request):
-    """顯示監測中的股票列表"""
-    stocks = Stock.objects.all()
-    form = StockForm()  # 確保表單存在
-    return render(request, "stocks/stock_list.html", {"stocks": stocks, "form": form})
 
 def add_stock(request):
     """新增監測股票並自動計算小跌和大跌閾值"""
@@ -78,3 +74,46 @@ def delete_stock(request, stock_id):
 def set_stock_info(request):
     set_stokc_info()
     return redirect("stock_list")
+def add_user(request):
+    if request.method == "POST":
+        form = UserForm(request.POST)
+        errors = []
+        if form.is_valid():
+            # 創建用戶
+            try:
+                user = form.save(commit=False)
+                user.set_password(form.cleaned_data["password1"])
+                user.save()
+                users = User.objects.all()
+                html = render_to_string("stocks/user_list.html", {"users": users})
+                return JsonResponse({"success": True, "html": html})
+            except Exception as e:
+                pdb.set_trace()
+                return JsonResponse({"success": False, "errors": str(e)})
+        else:
+            errors.append(f"{form.errors}")
+            return JsonResponse({"success": False, "html": render_to_string("stocks/user_list.html", {"form": form}), "errors": errors})
+def edit_user(request, user_id):
+    user = User.objects.get(id=user_id)
+    if request.method == "POST":
+        form = UserForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            users = User.objects.all()
+            html = render_to_string("stocks/user_list.html", {"users": users})
+            return JsonResponse({"success": True, "html": html})
+        else:
+            return JsonResponse({"success": False, "html": render_to_string("stocks/user_form.html", {"form": form})})
+    else:
+        form = UserForm(instance=user)
+    return render(request, "stocks/edit_user.html", {"form": form})
+def delete_user(request, user_id):
+    user = User.objects.get(id=user_id)
+    user.delete()
+    users = User.objects.all()  # 獲取所有用戶
+    html = render_to_string("stocks/user_list.html", {"users": users})
+    return JsonResponse({"success": True, "html": html})
+def user_list(request):
+    form = UserForm(request.POST or None)
+    users = User.objects.all()  # 獲取所有用戶
+    return render(request, 'stocks/user_list.html', {'users': users,'form': form})
