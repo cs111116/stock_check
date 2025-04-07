@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
+
 class User(AbstractUser):
     email = models.EmailField(unique=True)  # 用戶的電子郵件
     password = models.CharField(max_length=255)  # 用戶的密碼
@@ -21,6 +22,7 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
 class Stock(models.Model):
     symbol = models.CharField(max_length=10, unique=True)  # 股票代號
     name = models.CharField(max_length=255, null=True, blank=True)  # 股票名稱
@@ -32,6 +34,41 @@ class Stock(models.Model):
 
     def __str__(self):
         return f"{self.symbol} - {self.name} - {self.small_drop_threshold}%"
+
+class UserStock(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_stocks')
+    stock = models.ForeignKey(Stock, on_delete=models.CASCADE, related_name='user_stocks')
+    target_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # 目標價格
+    alert_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=5.00)  # 價格變動提醒百分比
+    is_active = models.BooleanField(default=True)  # 是否啟用追蹤
+    created_at = models.DateTimeField(auto_now_add=True)  # 追蹤添加時間
+    updated_at = models.DateTimeField(auto_now=True)  # 最後更新時間
+
+    class Meta:
+        unique_together = ('user', 'stock')  # 確保用戶不會重複追蹤同一支股票
+        ordering = ['-created_at']  # 預設按創建時間倒序排序
+
+    def __str__(self):
+        return f"{self.user.username} - {self.stock.symbol}"
+
+    @property
+    def price_difference(self):
+        """計算當前價格與目標價格的差距百分比"""
+        if self.target_price and self.stock.current_price:
+            return ((self.stock.current_price - self.target_price) / self.target_price) * 100
+        return None
+
+    @property
+    def status(self):
+        """獲取股票追蹤狀態"""
+        if not self.is_active:
+            return "已停用"
+        if self.price_difference is None:
+            return "追蹤中"
+        if abs(self.price_difference) >= self.alert_percentage:
+            return "需要關注"
+        return "追蹤中"
+
 class StockData(models.Model):
     symbol = models.CharField(max_length=10)  # 股票代號
     date = models.DateField()  # 交易日期
@@ -46,6 +83,7 @@ class StockData(models.Model):
         unique_together = ('symbol', 'date')
     def __str__(self):
         return f"{self.symbol} - {self.date}"
+
 class StockInfo(models.Model):
     stock_code = models.CharField(max_length=10, unique=True)  # 股票代號
     stock_name = models.CharField(max_length=100)  # 股票名稱

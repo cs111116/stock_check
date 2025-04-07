@@ -11,6 +11,7 @@ urlpatterns = [
     path("delete/<int:stock_id>/",  views.delete_stock, name="delete_stock"),
     path('user/list/', views.user_list, name='user_list'),  # 顯示所有用戶
     path('user/add/', views.add_user, name='add_user'),  # 新增用戶
+    path('user/get/<int:user_id>/', views.get_user, name='get_user'),
     path('user/edit/<int:user_id>/', views.edit_user, name='edit_user'),  # 編輯用戶
     path('user/delete/<int:user_id>/', views.delete_user, name='delete_user'),  # 刪除用戶
 ]
