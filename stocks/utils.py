@@ -7,8 +7,8 @@ import os
 from .api.fetch_stock_data import fetch_stock_data,fetch_history
 from .api.fetch_stock_info import fetch_stock_info
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-# CHAT_ID = os.getenv("CHAT_ID")
-CHAT_ID = os.getenv("TEST_CHAT_ID")
+CHAT_ID = os.getenv("CHAT_ID")
+# CHAT_ID = os.getenv("TEST_CHAT_ID")
 def calculate_pct_change(history):
     """計算每日收盤價的百分比變動"""
     return history['Close'].pct_change() * 100
@@ -51,7 +51,7 @@ def send_telegram_alert(stock, trend, price_change_percentage, data):
         f"今日最高: {data['High']:.2f}",
         f"今日最低: {data['Low']:.2f}",
         f"小跌/大跌: {stock.small_drop_threshold}% / {stock.large_drop_threshold}%",
-        f"目前成交量: {(data['Volume']/1000):.2f}張"
+        f"目前成交量: {(data['Volume']):.2f}張"
     ]
     if data['Forward_dividend_yield']:
         message_lines.append(f"目前殖利率(測試中): {data['Forward_dividend_yield']}")
@@ -83,22 +83,20 @@ def check_stock_prices():
                 logging_error(f"資料不足，無法處理股價：{stock.name}")
             price_change, price_change_percentage = calculate_price_change(result['Current_Price'],result['Previous_Price'])
             # 計算小跌、大跌
-            if price_change < 0 and abs(price_change_percentage) >= stock.small_drop_threshold and not stock.alert_sent_today:
-                trend = "🟢 小跌"
-                send_telegram_alert(stock, trend, abs(price_change_percentage), result)
-                stock.alert_sent_today = True  # 標記為已發送
-                stock.save()
-                logging_info(f"Stock {stock.symbol} - {stock.name}: 小跌, 小跌警報已寄送")
-            elif price_change < 0 and abs(price_change_percentage) >= stock.large_drop_threshold and not stock.alert_sent_today:
+            if price_change < 0 and abs(price_change_percentage) >= stock.large_drop_threshold and not stock.alert_sent_today:
                 trend = "🟢🟢 大跌"
                 send_telegram_alert(stock, trend, abs(price_change_percentage), result)
                 stock.alert_sent_today = True  # 標記為已發送
                 stock.save()
                 logging_info(f"Stock {stock.symbol} - {stock.name}: 大跌, 大跌警報已寄送")
+            elif price_change < 0 and abs(price_change_percentage) >= stock.small_drop_threshold and abs(price_change_percentage) < stock.large_drop_threshold and not stock.alert_sent_today:
+                trend = "🟢 小跌"
+                send_telegram_alert(stock, trend, abs(price_change_percentage), result)
+                stock.alert_sent_today = True  # 標記為已發送
+                stock.save()
+                logging_info(f"Stock {stock.symbol} - {stock.name}: 小跌, 小跌警報已寄送")
             else:
                 logging_info(f"Stock {stock.symbol} - {stock.name}: 無顯著變動。")
-                # trend = "測試"
-                # send_telegram_alert(stock, trend, abs(price_change_percentage), result)
             # 清除每日通知標記，讓下一次檢查重新設置
             if stock.last_alert_sent and stock.last_alert_sent.date() != datetime.today().date():
                 stock.alert_sent_today = False
